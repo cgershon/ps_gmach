@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>blockcontact</name>
+	<displayName><![CDATA[בלוק צור קשר]]></displayName>
+	<version><![CDATA[1.4.0]]></version>
+	<description><![CDATA[מאפשר לך להזין מידע נוסף לגבי שירות לקוחות]]></description>
+	<author><![CDATA[PrestaShop]]></author>
+	<tab><![CDATA[front_office_features]]></tab>
+	<is_configurable>1</is_configurable>
+	<need_instance>1</need_instance>
+	<limited_countries></limited_countries>
+</module>

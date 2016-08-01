@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>statsequipment</name>
+	<displayName><![CDATA[דפדפן ומערכת הפעלה]]></displayName>
+	<version><![CDATA[1.3.0]]></version>
+	<description><![CDATA[מוסיף את הכרטיסיה המכילה גרפים על דפדפן אינטרנט ושימוש במערכת הפעלה ללוח המחוונים סטטיסטיקה.]]></description>
+	<author><![CDATA[PrestaShop]]></author>
+	<tab><![CDATA[analytics_stats]]></tab>
+	<is_configurable>0</is_configurable>
+	<need_instance>0</need_instance>
+	<limited_countries></limited_countries>
+</module>

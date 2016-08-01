@@ -1,0 +1,17 @@
+
+  [{shop_url}] 
+
+שלום ,
+
+
+
+  . עבור מנהל  של הגמ"ח
+	       		                                  
+	           			בקשה ממתינה  לאישור 
+                  הרפרנס {order_name} מאת {shop_name} 
+ {firstname} {lastname}
+
+
+{shop_name} [{shop_url}]יישום ופיתוח
+על ידי YGPC(tm) [http://www.ygpc.net/] 
+
