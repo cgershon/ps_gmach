@@ -293,7 +293,7 @@ class OrderControllerCore extends ParentOrderController
 		            $file_attachment['size']     = filesize( $_SESSION['uploadrealfile'] );
                       //   var_dump( __LINE__ , $file_attachment);exit;
 				$result = $this->send_mail( $to, $tpl_name,$options , $file_attachment  )  ;  // send a mail to ask the manager to valid the loan .
-			  var_dump( __LINE__ , $result );exit;
+		//	  var_dump( __LINE__ , $result );exit;
 			   if( $this->validate() )    // test if the manager give his agrement  according to the identity card and if there is no current loan active.	
 	               	   $this->setTemplate(_PS_THEME_DIR_.'order-payment.tpl');
 	          	   else
@@ -756,10 +756,27 @@ catch( Exception $ex )
     // 4.passed one month from the last loan
     // 5.loan quantity type positive
     // 6. client not disbarred  -> probleme with him = deleted 
+   
     public function validate()
     {
-    	
-    	return true;
+    	 $id_customer = (int)$this->context->customer->id ;	
+	 $sql = new DbQuery();
+    	$sql =  " ";
+	$sql = " SELECT ko_orders.`id_order`,ko_orders.`date_add`,`active`,`billing_cycles` FROM admin_gmahexpress.ko_orders LEFT JOIN admin_gmahexpress.ko_customer USING( `id_customer` ) JOIN admin_gmahexpress.ko_message ON( ko_orders.`id_customer` = ko_message.`id_customer` AND ko_orders.`id_order`= ko_message.`id_order`  ) WHERE ko_orders.`id_customer` = '".$id_customer."' AND `active`='1' ORDER BY `date_add` DESC LIMIT 1 " ;
+						
+	 $result= Db::getInstance()->executeS( $sql  );
+//				var_dump(  ' REQUEST: ', $sql, $result );exit;
+    	$date1=new datetime ( $result[0]['date_add'] ); 
+    	$date2 =new datetime( date('Y-m-d h:m:s') );
+    	$interval = $date1->diff( $date2 );
+	var_dump(  $interval->format( '%R%a days' ) );
+	if(  $interval->format( '%R%a days' ) >   ( $result[0]['billing_cycles'] +1 )* 30  )
+    		return true;
+    	else
+   	 	{
+   	 		echo("<script type=text/javascript>alert('הלוואה קיימת לא ניתן לקחת עוד אחד !')</script></Div>");
+   	 		return false;
+   	 	}	
     }	
  /* ******************************* send_mail() ********************************************* */   
   public function send_mail( $to="", $tpl_name="", $options="", $file_attachment=NULL )
