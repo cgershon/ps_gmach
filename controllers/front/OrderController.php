@@ -31,7 +31,7 @@ class OrderControllerCore extends ParentOrderController
     const STEP_ADDRESSES = 1;
     const STEP_DELIVERY = 2;
     const STEP_PAYMENT = 3;
-
+    public $carence = 30;// ADDED YGPC 
     /**
      * Initialize order controller
      * @see FrontController::init()
@@ -258,47 +258,16 @@ class OrderControllerCore extends ParentOrderController
                 $this->_assignSummaryInformations();
                 $available_tz = FALSE;
                 $available_tz = $this->_testTz();	// test if there is an image of tz
-               // SEND MAIL WAIT FOR AGREMENT ADDED YGPC
+               
 	        if ( $available_tz )
 		    {	
 		    		global $cookie;
-		    
-		    		$to =  $this->context->customer->email ;//"somebody@example.com";
-				$tpl_name= 'gmach_validation';
-				$options['subject'] = "בקשה בטיפול";  
-				$tz_path= "/var/www/vhosts/konim.biz/ps_gmach/upload/tz/";
-				$options['datas'] = array('{nom}'  => $this->context->customer->firstname,  '{prenom}'  => $this->context->customer->lastname ,				
-				'{tz}'=>$tz_path. basename( $available_tz ) ,  'tz'=>$tz_path. basename( $available_tz )  );
-				$options['dir_tpl']= _PS_MAIL_DIR_;
-				$options['{firstname}'] = $this->context->customer->firstname;
-				$options['{lastname}'] = $this->context->customer->lastname;
-				$options['{tz}'] = $_SESSION['identity_number'];
-				$options['{uploadrealfile}'] = $_SESSION['uploadrealfile'];
-				$options['{uploadfile}'] = $_SESSION['identity_img'];
-				
-				$result = $this->send_mail( $to, $tpl_name,$options ,null ) ;  // send a mail to say that the asked loan  is in process
-				
-				// inform the manager 
-				$Gmach_mail="gmach@ygpc.net";
-				$tpl_name='manager_validation';
-                          $to=$Gmach_mail;
-                          $filename =basename( $available_tz );
-                          $file_attachment['rename'] = uniqid().Tools::strtolower(substr(   $filename , -5 ) );
-                          //$file_attachment['content'] = file_get_contents(  $file_tmp_name );
-		            
-		            $file_attachment['tmp_name'] =  $_SESSION['uploadrealfile'];
-		            $file_attachment['name']     =   $filename;
-		            $file_attachment['mime']     =  filetype( $_SESSION['uploadrealfile'] );
-		            $file_attachment['error']    =  'tz_error';
-		            $file_attachment['size']     = filesize( $_SESSION['uploadrealfile'] );
-                      //   var_dump( __LINE__ , $file_attachment);exit;
-				$result = $this->send_mail( $to, $tpl_name,$options , $file_attachment  )  ;  // send a mail to ask the manager to valid the loan .
-		//	  var_dump( __LINE__ , $result );exit;
-			   if( $this->validate() )    // test if the manager give his agrement  according to the identity card and if there is no current loan active.	
-	               	   $this->setTemplate(_PS_THEME_DIR_.'order-payment.tpl');
-	          	   else
-	               	   $this->setTemplate(_PS_THEME_DIR_.'order-carrier.tpl');// loop to the bank form
-	      	 }	 
+		     	// if the manager give his agrement  according to the identity card and if there is no current loan active, process to payment .	
+				if( $this->_validate( $available_tz ) )   
+		               	   $this->setTemplate(_PS_THEME_DIR_.'order-payment.tpl');
+		             else
+		               	   $this->setTemplate(_PS_THEME_DIR_.'order-carrier.tpl');// loop to the bank form
+		      	 }	 
                 else
               	{
               		  echo ' <script type=text/javascript>alert("נא להכניס תמונה של תעודת זהות בבקשה !")</script></Div>';
@@ -740,7 +709,7 @@ catch( Exception $ex )
      			return (  FALSE ) ; }
      	else
      		{   	if ( filesize ( $_SESSION['uploadrealfile'] ) === FALSE  ||  filesize ( $_SESSION['uploadrealfile'] ) > 4000000   ) 
-     				{	echo'<script type=text/Javascript> alert(" תמונה לא חוקית גודל צריך ליהיות בן500K ל4MB");</script>';
+     				{	echo'<script type=text/Javascript> alert(" תמו נה לא חוקית גודל צריך ליהיות בן 500K ל4MB ");</script>';
      					return( false);
      					//var_dump($_SESSION['identity_img'], filesize ( $_SESSION['identity_img'] ) );exit ('No image ');
      				}
@@ -748,278 +717,119 @@ catch( Exception $ex )
      			return ( $_SESSION['identity_img']  ) ; }	
         return (  FALSE ) ; 
     }
-     /* ********************************validate() ****************************************** */
+     /* ******************************* _validate() ****************************************** */
     //  conditions to validate:
     // 1. got identity card image 
     // 2.it is that of the loaner
     // 3.there is not another loan active 
     // 4.passed one month from the last loan
     // 5.loan quantity type positive
-    // 6. client not disbarred  -> probleme with him = deleted 
+    // 6. client not disbarred  -> probleme with him = freeze 
    
-    public function validate()
+    public function _validate( $available_tz )
     {
     	 $id_customer = (int)$this->context->customer->id ;	
 	 $sql = new DbQuery();
-    	$sql =  " ";
-	$sql = " SELECT ko_orders.`id_order`,ko_orders.`date_add`,`active`,`billing_cycles` FROM admin_gmahexpress.ko_orders LEFT JOIN admin_gmahexpress.ko_customer USING( `id_customer` ) JOIN admin_gmahexpress.ko_message ON( ko_orders.`id_customer` = ko_message.`id_customer` AND ko_orders.`id_order`= ko_message.`id_order`  ) WHERE ko_orders.`id_customer` = '".$id_customer."' AND `active`='1' ORDER BY `date_add` DESC LIMIT 1 " ;
+    	 $sql =  '';
+	 $sql = " SELECT ko_orders.`id_order`,ko_orders.`date_add`,`active`,`billing_cycles` FROM admin_gmahexpress.ko_orders LEFT JOIN admin_gmahexpress.ko_customer USING( `id_customer` ) JOIN admin_gmahexpress.ko_message ON( ko_orders.`id_customer` = ko_message.`id_customer` AND ko_orders.`id_order`= ko_message.`id_order`  ) WHERE ko_orders.`id_customer` = '".$id_customer."' AND `active`='1' ORDER BY `date_add` DESC LIMIT 1 " ;
 						
 	 $result= Db::getInstance()->executeS( $sql  );
-//				var_dump(  ' REQUEST: ', $sql, $result );exit;
+			//	var_dump(  ' REQUEST: ', $sql, $result );exit;
+	if( ! $result[0]['active'] )
+		{
+			echo( '<script type=text/javascript> alert( "חשבון מוקפא ! " ) </script></Div>' );
+   	 		return false;
+		}
     	$date1=new datetime ( $result[0]['date_add'] ); 
     	$date2 =new datetime( date('Y-m-d h:m:s') );
     	$interval = $date1->diff( $date2 );
-	var_dump(  $interval->format( '%R%a days' ) );
-	if(  $interval->format( '%R%a days' ) >   ( $result[0]['billing_cycles'] +1 )* 30  )
-    		return true;
+	
+	//var_dump(  $interval->format( '%R%a days' ) ,$result[0]['active']  );
+	if(  $result === NULL || $interval->format( '%R%a days' ) >   ( $result[0]['billing_cycles'] +1 )* 30  )
+  		  {
+  		  	 
+		    		$to =  $this->context->customer->email ;//"somebody@example.com";
+				$tpl_name= 'gmach_validation';
+				$options['subject'] = "בקשה בטיפול";  
+				$tz_path= 'http://gmach.konim.biz/upload/tz/';
+				$wait_path= 'http://gmach.konim.biz/upload/wait/';
+				$options['datas'] = array('{nom}'  => $this->context->customer->firstname,  '{prenom}'  => $this->context->customer->lastname ,			
+				'{tz_path}'=>$tz_path. basename( $available_tz ) ,  'tz_path'=>$tz_path. basename( $available_tz )  );
+				$options['dir_tpl']= _PS_MAIL_DIR_;
+				$options['{firstname}'] = $this->context->customer->firstname;
+				$options['{lastname}'] = $this->context->customer->lastname;
+				$options['{tz}'] = $_SESSION['identity_number'];
+				$options['{tz_path}'] = 	$tz_path. basename( $available_tz ) ;
+				$options['{wait_path}'] = $wait_path.'wait.png' ;
+				$options['{uploadrealfile}'] = $_SESSION['uploadrealfile'];
+				$options['{uploadfile}'] = $_SESSION['identity_img'];
+			
+		
+				$result = $this->send_mail( $to, $tpl_name,$options ,null ) ;  // send a mail to the client  saying that the asked loan  is in process
+				 //var_dump( __LINE__ ,$to, $tpl_name,$options , $result );exit;
+				// inform the manager 
+				$Gmach_mail="gmach@ygpc.net";
+				$tpl_name='manager_validation';
+                          $to=$Gmach_mail;
+                          $filename =basename( $available_tz );
+                          $file_attachment['rename'] = uniqid().Tools::strtolower(substr(   $filename , -5 ) );
+                          //$file_attachment['content'] = file_get_contents(  $file_tmp_name );
+		            
+		            $file_attachment['tmp_name'] =  $_SESSION['uploadrealfile'];
+		            $file_attachment['name']     =   $filename;
+		            $file_attachment['mime']     =  filetype( $_SESSION['uploadrealfile'] );
+		            $file_attachment['error']    =  'tz_error';
+		            $file_attachment['size']     = filesize( $_SESSION['uploadrealfile'] );
+             	      //   var_dump( __LINE__ , $file_attachment);exit;
+				$result = $this->send_mail( $to, $tpl_name,$options ,null ); // $file_attachment  )  ;  // send a mail to the manager asking him to valid the loan .
+				//	  var_dump( __LINE__ , $result );exit; 
+  			return true;
+  		  }
     	else
    	 	{
-   	 		echo("<script type=text/javascript>alert('הלוואה קיימת לא ניתן לקחת עוד אחד !')</script></Div>");
+   	 		$permission = 	( $result[0]['billing_cycles'] +1 ) * $this->carence  - $interval->format( '%R%a days' ) ; 
+   	 		$message = '   הלוואה קיימת לא ניתן לקחת עוד אחד !  \n ' ;
+   	 		$message .= 'לנסות בעוד '.$permission.' ימים \nתודה .'  ; 
+   	 	//	echo( ' '. $message.'\n' );//sleep( 5 );
+   	 		echo( '<script type=text/javascript> alert("'. $message.'" ) </script></Div>' );
+   	 	
    	 		return false;
    	 	}	
     }	
  /* ******************************* send_mail() ********************************************* */   
-  public function send_mail( $to="", $tpl_name="", $options="", $file_attachment=NULL )
- 	{
- 				
-                                  /*  $customer = new Customer((int)($order->id_customer));
-                                    $params['{lastname}'] = $customer->lastname;
-                                    $params['{firstname}'] = $customer->firstname;
-                                    $params['{id_order}'] = $order->id;
-                                    $params['{order_name}'] = $order->getUniqReference();
-                                    $params['{voucher_amount}'] = Tools::displayPrice($cart_rule->reduction_amount, $currency, false);
-                                    $params['{voucher_num}'] = $cart_rule->code;
-                                    */
-                                 /*   if($file_attachment){
-                      			  var_dump(__LINE__,$to,$tpl_name,$options,' FILE ATTACHEMENT:',$file_attachment);
-                      			exit (' Mail Send ');
-	                      			}*/
-	                      	if( $file_attachment ){
-	                      	    $file_attachment_coded  = Tools::fileAttachment( $file_attachment );	
-	                      //	var_dump($file_attachment, $file_attachment_coded)  ; exit(__LINE__);
-	                      	}
-                               @Mail::Send(1, $tpl_name, $options['subject'], $options, $to, $options['{firstname}'].' '.$options['{lastname}'], null, null, $file_attachment_coded , null, _PS_MAIL_DIR_, true, (int)$order->id_shop);
-                                   
-        }
- /* ****************************************************************************************************** */
- public function send_mail_test( $to,$tpl_name,$options )
- 	{
- 	 	 	global $cookie;
-	           
-	             $passage_ligne = '\r\n';  
-	          	$id_customer = (int)$this->context->customer->id ;
-	          	$customer_name = $this->context->customer->firstname.  ' '.$this->context->customer->lastname  ;
-	          	$Gmach_mail="gmach@ygpc.net";
-	          
-	          	$id_lang=  intval($cookie->id_lang);
+  public function send_mail( $_to='', $tpl_name='', $options='', $_file_attachment=NULL )
+ 	{				
+                                 
+                   $id_lang=  1;//intval($cookie->id_lang);
 	          	$template= $tpl_name;
 	          	$subject=  $options['subject'];
-	          	$template_vars= $options['datas'];
-	          	$to=$to;
-	          	$to_name = $customer_name;
+	          	$template_vars= $options;
+	          	$to=$_to;
+	          	$to_name = $options['{firstname}'].' '.$options['{lastname}'];
 	         	$from='gmach@ygpc.net';
 	          	$from_name =  'gmachexpress';
-	          	$file_attachment = NULL;
+	          	$file_attachment =  $_file_attachment;
    			$mode_smtp = null;
         		$template_path = _PS_MAIL_DIR_;
         		$ddie = false;
-        		$id_shop = null;
-        		$bcc = null;
-        		$reply_to = null;
-			//=====Déclaration des messages au format texte et au format HTML.
-	             $txt =' בקשתכם בטיפול    לאישור . שרות לקוחות של הגמ"ח';
-			$message_html = '<p align="center"> '.$customer_name.'</p><div style="text-align:right; padding-right:10px;"></div>';
-			//==========
-			 
-			//=====Création de la boundary
-			$boundary = "-----=".md5(rand());
-			//==========
-			 
-			//=====Définition du sujet.
-			$preferences = ['input-charset' => 'UTF-8', 'output-charset' => 'UTF-8'];
-			$encoded_subject = iconv_mime_encode('Subject', $subject, $preferences);
-			$encoded_subject = substr($encoded_subject, strlen('Subject: '));
-			//=========
-			 
-			//=====Création du header de l'e-mail.
-			$headers = 'From: '.$from.    $passage_ligne;    //  .' Bcc:< info@ygpc.net>';
-			//$headers.= ' Reply-to: Gmach_Express<'.$from.'> ';
-			$headers.= ' MIME-Version: 1.0 '.   $passage_ligne;
-			$headers .= "Content-type:  text/html;   charset=UTF-8";
-			//$headers.= ' Content-Type: multipart'.' boundary='.$boundary;
-                	$headers .=' Content-Transfer-Encoding: quoted-printable';
-              	//$headers .=' Content-transfer-encoding:8bit ';
-                 	//$headers .=' Content-Type: image/jpg ';
-		 
-			//=====Création du message. 
-			$message = "--";//.$boundary;
-			//=====Ajout du message au format texte.
-			//$message.= ' Content-Type: text/plain; charset=UTF-8 ';
-			$message.=$txt;
-			//==========
-		//	$message.= "--".$boundary;
-			//=====Ajout du message au format HTML
-		//	$message.= ' Content-Type: text/html; charset=UTF-8 ';
-			$message.= $message_html;
-			//==========
-		//	$message.= "--".$boundary."--";
-		//	$message.= "--".$boundary."--";
-			//==========
-			 
-			//=====Envoi de l'e-mail.
-	             $result=mail( $to, $encoded_subject,$message,$headers );     // ADDED YGPC
-			//==========
- 	
-			// Inform the manager
-	 		$id_lang=  intval($cookie->id_lang);
-	          	$template= 'validate_bank_datas';
-	          	//$subject=  $options['subject'];
-	          	$template_vars= $options['datas'];
-	          	$to=$Gmach_mail;
-	          	$to_name = 'שרות לקוחות';
-	         	$from="gmach@ygpc.net";
-	          	$from_name =  'gmachexpress';
-	          	$file_attachment =  NULL;
-   			$mode_smtp = null;
-        		$template_path = _PS_MAIL_DIR_;
-        		$ddie = false;
-        		$id_shop = null;
-        		$bcc = null;
-        		$reply_to = null;   
-	             $txt ='בקשה התקבלה  לאשר אותה    : עבור שרות לקוחות של הגמ"ח ';
-	           
-			//=====Création du message. 
-			$message = "--";//.$boundary;
-			//=====Ajout du message au format texte.
-			//$message.= ' Content-Type: text/plain; charset=UTF-8 ';
-			$message.= $txt;
-			//==========
-		//	$message.= "--".$boundary;
-			//=====Ajout du message au format HTML
-			$message_html='<p align="center" שם הלווה >'.$customer_name.'   תהודת  זהות '.$_SESSION["identity_number"].'<img src="'.$options['datas']["tz"].'"  alt="gmachexpress" width="100"height="100"  /></p>
-	           	 <div style="text-align:right; padding-right:10px;"> בקשה התקבלה נא לאשר אותה  <br/>  : עבור שרות לקוחות של הגמ"ח </div>';
-			$message.= ' Content-Type: text/html; charset=UTF-8 ';
-			$message.= $message_html;
-			//==========
-			//$message.= "--".$boundary."--";
-			//$message.= 'Content-Type: image/jpg ';
-
-			//$message.= "--".$boundary."--";
-			//==========
-		//	$message.= "--".$boundary."--";
-		//	$message.= "--".$boundary."--";
-			//========== 
-			//=====Envoi de l'e-mail.
-	             $result=mail( $to, $encoded_subject,$message,$headers );     // ADDED YGPC
-			//==========
-	
- 	}
-    /* ******************************************************************************************** */
-/* http://emilienmalbranche.fr/prestashop-ecommerce-tutoriels/tutoriels/envoyer-des-mails-grace-a-la-fonction-mailsend-de-prestashop/
-Dans le cas d’une boutique en ligne l’envoi d’ emails est très important pour communiquer avec vos clients.
-Je vais vous présenter une fonction de prestashop très simple et utile pour envoyer des mails avec en complément un template que vous pourrez mettre en forme facilement !
-
-La classe Mail et sa fonction Send()
-Commençons par le code, je vous expliquerai ensuite le fonctionnement de ce dernier.
-
-global $cookie;
- 
-$subject = 'Bonjour';
-$donnees = array('{nom}'  => 'Jobs' ,  '{prenom}'  => 'Steve' );
-$destinataire = 'mail@destinataire.com';
- 
-Mail::Send(intval($cookie->id_lang), 'montemplate', $sujet , $donnees, $destinataire, NULL, NULL, NULL, NULL, NULL, 'mails/');
-Dans un premier temps, nous initialisons diverses variables qui contiennent le sujet du mail, les données que ce dernier comprendra (oui oui, on peut mettre des variables dans les mails :) ) ainsi que l’adresse mail du destinataire.
-
-Ces variables seront utilisées dans la fonction ‘Send()’ de la classe ‘Mail’. J’utilise des variables pour mettre toutes les informations d’envoi du mail, cela permet une meilleure clarté.
-
-Voyons maintenant la fonction en détails, elle comprends beaucoup de paramètres :
-
-L’id de la langue [ ici intval($cookie->id_lang), variable cookie qui récupère l'id de la langue actuelle ]
-Le nom du template [ ici 'montemplate' ]
-Le sujet [ ici 'Bonjour' ]
-Un tableau contenant les données à placer dans le template [ ici $donnees ]
-Le destinataire [ ici 'mail@destinataire.com' ]
-Le nom du destinataire [ ici NULL ]
-L’adresse mail de l’émetteur [ ici NULL ]
-Le nom de l’émetteur [ ici NULL ]
-Une pièce jointe [ ici NULL ]
-Le mode SMTP [ ici NULL ]
-Le chemin vers le dossier contenant le template [ ici le dossier mails à la racine ]
-Le template
-Rendez-vous dans le dossier mails/fr , c’est là que notre fonction va aller chercher le fichier template que nous lui avons indiqué. (rappelez-vous : ‘mails/’)
-
-Vous devez impérativement créer deux fichiers, un .txt et un .html portant tout les deux le nom de votre template ( ici  ‘montemplate’ ).
-Créez donc les fichiers montemplate.txt et montemplate.html dans le dossier mails/fr/.
-
-Le fichier html est celui utilisé pour le template du mail, avec donc du code html.
-Le fichier txt est utilisé au cas où le destinataire n’arrive pas à lire le mail, il contient alors du texte brut.
-
-Ajoutons maintenant du contenu dans notre fichier montemplate.html :
-
-<h1>Bonjour {prenom} {nom}</h1>
-
-Puis pour notre fichier montemplate.txt :
-
-Bonjour {prenom} {nom}
-
-  public static function Send(  $id_lang, $template, $subject, $template_vars, $to,
-    							    $to_name = null, $from = null, $from_name = null, $file_attachment = null, $mode_smtp = null,
-   							    $template_path = _PS_MAIL_DIR_, $die = false, $id_shop = null, $bcc = null, $reply_to = null)
-*/    
-// ADDED YGPC
-public  function send_mail_swift($to,$tpl_name,$options) 
-	 {
-	 		global $cookie;
-	          	$id_customer = (int)$this->context->customer->id ;
-	          	$customer_name = $this->context->customer->firstname.  ' '.$this->context->customer->lastname  ;
-	          	$Gmach_mail="gmach@ygpc.net";
-	          
-	          	$id_lang=  intval($cookie->id_lang);
-	          	$template= $tpl_name;
-	          	$subject=  $options['subject'];
-	          	$template_vars= $options['datas'];
-	          	$to=$to;
-	          	$to_name = $customer_name;
-	         	$from="gmach@ygpc.net";
-	          	$from_name =  'gmachexpress';
-	          	$file_attachment = NULL;
-   			$mode_smtp = null;
-        		$template_path = _PS_MAIL_DIR_;
-        		$ddie = false;
-        		$id_shop = null;
-        		$bcc = null;
-        		$reply_to = null;
-	          	
-	          	$result = 	Mail::Send(	$id_lang, $template, $subject, $template_vars, $to,
-										$to_name , $from , $from_name , $file_attachment , $mode_smtp ,
-										$template_path , $ddie, $id_shop , $bcc , $reply_to  );
-	         	//	var_dump($result ,$to,$tpl_name,$options); exit;	
-	 		// Inform the Director 
-	 		$id_lang=  intval($cookie->id_lang);
-	          	$template= 'validate_bank_datas';
-	          	$subject=  $options['subject'];
-	          	$template_vars= $options['datas'];
-	          	$to=$Gmach_mail;
-	          	$to_name = 'שרות לקוחות';
-	         	$from="gmach@ygpc.net";
-	          	$from_name =  'gmachexpress';
-	          	$file_attachment =  NULL;
-   			$mode_smtp = null;
-        		$template_path = _PS_MAIL_DIR_;
-        		$ddie = false;
-        		$id_shop = null;
+        		$id_shop = (int)$order->id_shop;
         		$bcc = null;
         		$reply_to = null;
         		
-	 		$result = 	Mail::Send(	$id_lang, $template, $subject, $template_vars, $to,
-										$to_name , $from , $from_name , $file_attachment , $mode_smtp ,
-										$template_path , $ddie, $id_shop , $bcc , $reply_to  );
-	        //	var_dump($result ,$to,$tpl_name,$options); exit;	
-	              return $result;	
-	         //		var_dump($result ,$to,$tpl_name,$options); exit;	
-	        //  	var_dump(intval($cookie->id_lang),	$result ,$to,$tpl_name,$options); exit;		 
-		
-	 }   
+	           	if( $file_attachment )
+	                  {
+	                      $file_attachment_coded  = Tools::fileAttachment( $file_attachment );	
+	                 
+	                  }
+	           /* var_dump($id_lang, $template, $subject, $template_vars, $to,
+							$to_name , $from , $from_name , $file_attachment , $mode_smtp ,
+							$template_path , $ddie, $id_shop , $bcc , $reply_to, $file_attachment_coded)  ; exit(__LINE__);
+                    */
+                    	 @Mail::Send(	$id_lang, $template, $subject, $template_vars, $to,
+							$to_name , $from , $from_name , $file_attachment , $mode_smtp ,
+							$template_path , $ddie, $id_shop , $bcc , $reply_to  );
+                                   
+        }
+
   /* **************************************************************************************************** */  
 }
