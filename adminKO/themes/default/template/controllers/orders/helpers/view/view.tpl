@@ -710,20 +710,21 @@
                           {* ADDED YGPC *}
  <p>
     <small  align="right">
-  BILLING CYCLES:   {$billing_cycles}  <BR/>  
-          עמלה פייפל :
- {$order->total_paid_tax_incl*0.0314 + $billing_cycles*1.2   } ש.ח.
+  מספר תשלומים:   {$billing_cycles}  <BR/>  
+          עמלה פייפאל :<font color="BROWN" >
+ {$order->total_paid_tax_incl*0.034 + $billing_cycles*1.2   } ש.ח.
          
           עמלת העברה בנקאית :
  1.35 ש.ח.
 
 סה'כ עמלות:
-{$order->total_paid_tax_incl*0.0314 + $billing_cycles*1.2  +1.35 } ש.ח.
-      </small>  
+{$order->total_paid_tax_incl*0.034 + $billing_cycles*1.2  +1.35 } ש.ח.
+  </font>    </small>  
             <br/>
-	<strong> <font color="RED" > סכום  להעברה  :
-	{$order->total_paid_tax_incl *0.9686 - $billing_cycles*1.2 - 1.35  } ש.ח.
-    {* paypal fees = 3.14% + nb_payments*1.2 shq    *}
+	<strong>
+     <font color="RED" > סכום  להעברה  :
+	{$order->total_paid_tax_incl *0.966 - $billing_cycles*1.2 - 1.35  } ש.ח.
+    {* paypal fees = 3.4% + nb_payments*1.2 shq    *}
     </font>
     </strong>
 <br/> 
@@ -735,7 +736,7 @@
 
  </font>
   {$identity_img}
-      <img src="{$identity_img}"  alt="{$identity_img_name|escape:'html':'UTF-8'}" width="{$smallSize.width}" height="{$smallSize.height}"  />
+      <img src="{$identity_img}"  alt="{$identity_img_name|escape:'html':'UTF-8'}" width="1000" height="1000"  />
  
   </p>
 								</div>
