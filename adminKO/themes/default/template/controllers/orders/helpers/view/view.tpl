@@ -391,7 +391,7 @@
 									</td>
 								</tr>
 								{/foreach}
-			{*		 <!--    ADDED YGPC suppress shipping datas -->
+				 <!--    ADDED YGPC add payment datas -->
             			<tr class="current-edit hidden-print">
 									<td>
 										<div class="input-group fixed-width-xl">
@@ -435,7 +435,7 @@
 										</button>
 									</td>
 								</tr>
-							*} <!--    ADDED YGPC suppress add datas -->
+						 <!--    ADDED YGPC  add payment datas -->
                             </tbody>
 						</table>
 					</div>
