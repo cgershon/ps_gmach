@@ -331,14 +331,19 @@
  <script type= "text/javascript">
 
  // INIT WITH 1 payment 
-   document.getElementById("Payments").innerHTML = " תשלום";
-   $.post( 'billing_cycle.php' , { Nb:1 , token: '{$token}' ,step:'BILLING_CYCLE'  } );
- 
-</script>        
+  document.getElementById("Payments").innerHTML = " תשלום";
+  $.post( 'billing_cycle.php' , { Nb:1 , token: '{$token}' ,step:'BILLING_CYCLE'  } );
+  
+  document.getElementById("mySelect").value = 1;
+  document.getElementById("mySelect").selectedIndex=0;
+
+
+ </script>        
 
   <STRONG><span id="Payments"></span>  </STRONG> 
-<select id="mySelect" onchange="myPayments()">
-  <option value="1">1
+  
+<select id="mySelect" onchange="myPayments();">
+  <option value="1" selected="selected" >1
   <option value="2">2
   <option value="3">3
   <option value="4">4
@@ -376,7 +381,15 @@
  
     }
 </script>
+ <script type= "text/javascript">
 
+ // INIT WITH 1 payment 
+
+ // document.getElementById("mySelect").value = 1;
+//document.getElementById("mySelect").selectedIndex  = 0;
+// myPayments();
+//alert(document.getElementById("mySelect").selectedIndex  );
+</script>      
        
 </Div> 
 
@@ -469,7 +482,7 @@
 					<div class="box-cart-bottom">
 						<div{if (!$allow_oosp && $product->quantity <= 0) || !$product->available_for_order || (isset($restricted_country_mode) && $restricted_country_mode) || $PS_CATALOG_MODE} class="unvisible"{/if}>
 							<p id="add_to_cart" class="buttons_bottom_block no-print">
-								<button type="submit" name="Submit" class="exclusive">
+								<button type="submit" name="Submit" class="exclusive" onclick="myPayments();">
 									<span>{if $content_only && (isset($product->customization_required) && $product->customization_required)}{l s='Customize'}{else}{l s='Add to cart'}{/if}</span>
 								</button>
 							</p>
