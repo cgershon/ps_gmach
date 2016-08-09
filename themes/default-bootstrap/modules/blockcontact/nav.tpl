@@ -17,7 +17,7 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author PrestaShop SA <contact@prestashop.com>
+*  @author PrestaShop SA 
 *  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
@@ -28,5 +28,12 @@
 {if $telnumber}
 	<span class="shop-phone{if isset($is_logged) && $is_logged} is_logged{/if}">
 		<i class="icon-phone"></i>{l s='Call us now:' mod='blockcontact'} <strong>{$telnumber}</strong>
-	</span>
+     </span>  
+	
+ <font color="#FFFFFF">    	
+ <marquee  direction="right"  width="1000" scrolldelay="70">
+	&nbsp;ידוע ללווה שהעמלה של החברה פייפאל תרד מהסכום המופקד בחשבונו ולא נחשבת ריבית
+&nbsp;-	&nbsp;מבקשים מהלווים לקחת בחשבון שיש מקרים מאוד דחופים ולא לקחת הלוואה להסגת מותרות.</marquee>
+</font>
+
 {/if}
