@@ -554,7 +554,7 @@ class OrderControllerCore extends ParentOrderController
 						 $uploadfile =  $uploaddir .$id_customer; // image file name with id_customer in it             ../../upload/tz/1
 						 
 						$uploadfile .= '_'.basename(  $_FILES['identity_img']['name'] ) ; // name without path         ../../upload/tz/1_img_name.jpg
-						$uploadrealfile = '/var/www/vhosts/konim.biz/ps_gmach/upload/tz/'.$id_customer.'_'.basename(  $_FILES['identity_img']['name'] ) ;	
+						$uploadrealfile = _PS_ROOT_DIR_."/upload/tz/".$id_customer.'_'.basename(  $_FILES['identity_img']['name'] ) ;	
 						
 						$this->context->smarty->assign( array( 'identity_img_name' => $_FILES['identity_img']['name']  ) );
 						$this->context->smarty->assign( array(  'identity_img_path' =>  $uploaddir   ) ) ;
@@ -569,7 +569,7 @@ class OrderControllerCore extends ParentOrderController
 							*/
 							$_SESSION['identity_img'] =$uploadfile;
 							$_SESSION['uploadrealfile'] =$uploadrealfile;	
-					//	var_dump (__LINE__,	$_SESSION['identity_img']  )  ;	exit;
+					//	var_dump (__LINE__,	$_SESSION['identity_img'] , _PS_ROOT_DIR_ ,'  ', $_SERVER['SERVER_NAME'])  ;	exit;
 							}
 					 	$_SESSION['img_tmp_name'] =   'identity_img';
 					 //	unset ($_FILES['identity_img']['tmp_name'] )   ;
@@ -603,11 +603,11 @@ class OrderControllerCore extends ParentOrderController
 								 	 	'identity_img_path' =>  $uploaddir,
 								 	 	'identity_img_real_name' => $uploaddir.basename( $img_exists[0]['identity_img'] )  
 								  )  );
-								 $_SESSION['uploadrealfile'] =  '/var/www/vhosts/konim.biz/ps_gmach/upload/tz/'.
+								 $_SESSION['uploadrealfile'] = _PS_ROOT_DIR_."/upload/tz/".
 								 								$id_customer.'_'.basename( $img_exists[0]['identity_img'] ) ;	
 
 								 $_SESSION['identity_img'] =$img_exists[0]['identity_img'];	
-								 	var_dump (__LINE__,	$_SESSION['identity_img']  )  ;	exit;			
+								 //	var_dump (__LINE__,	$_SESSION['identity_img']  )  ;	exit;			
 								    	return( TRUE );	  
 		    					}
 			    		//var_dump(  ' REQUEST: ',$sql,$img_exists[0]['identity_img'] );exit;	
@@ -735,24 +735,26 @@ catch( Exception $ex )
 						
 	 $result= Db::getInstance()->executeS( $sql  );
 			//	var_dump(  ' REQUEST: ', $sql, $result );exit;
-	if( ! $result[0]['active'] )
+	if( $result)
+	 {
+		if( ! $result[0]['active'] )
 		{
 			echo( '<script type=text/javascript> alert( "חשבון מוקפא ! " ) </script></Div>' );
    	 		return false;
-		}
-    	$date1=new datetime ( $result[0]['date_add'] ); 
-    	$date2 =new datetime( date('Y-m-d h:m:s') );
-    	$interval = $date1->diff( $date2 );
-	
-	//var_dump(  $interval->format( '%R%a days' ) ,$result[0]['active']  );
-	if(  $result === NULL || $interval->format( '%R%a days' ) >   ( $result[0]['billing_cycles'] +1 )* 30  )
-  		  {
+			}
+	    	$date1=new datetime ( $result[0]['date_add'] ); 
+	    	$date2 =new datetime( date('Y-m-d h:m:s') );
+	    	$interval = $date1->diff( $date2 );
+		
+		//var_dump(  $interval->format( '%R%a days' ) ,$result[0]['active']  );
+		if(  $result === NULL || $interval->format( '%R%a days' ) >   ( $result[0]['billing_cycles'] +1 )* 30  )
+	  		  {
   		  	 
 		    		$to =  $this->context->customer->email ;//"somebody@example.com";
 				$tpl_name= 'gmach_validation';
 				$options['subject'] = "בקשה בטיפול";  
-				$tz_path= 'http://gmach.konim.biz/upload/tz/';
-				$wait_path= 'http://gmach.konim.biz/upload/wait/';
+				$tz_path= "http://".$_SERVER['SERVER_NAME']."/upload/tz/";
+				$wait_path= "http://".$_SERVER['SERVER_NAME']."/upload/wait/";
 				$options['datas'] = array('{nom}'  => $this->context->customer->firstname,  '{prenom}'  => $this->context->customer->lastname ,			
 				'{tz_path}'=>$tz_path. basename( $available_tz ) ,  'tz_path'=>$tz_path. basename( $available_tz )  );
 				$options['dir_tpl']= _PS_MAIL_DIR_;
@@ -795,6 +797,8 @@ catch( Exception $ex )
    	 	
    	 		return false;
    	 	}	
+   	 	
+   	}	return true;  // didn't get a result => no orders for this client 
     }	
  /* ******************************* send_mail() ********************************************* */   
   public function send_mail( $_to='', $tpl_name='', $options='', $_file_attachment=NULL )
