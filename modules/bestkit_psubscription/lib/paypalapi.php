@@ -1,4 +1,4 @@
-<?php	@session_start();
+<?php @session_start();
 /*		https://developer.paypal.com/docs/classic/express-checkout/integration-guide/ECRecurringPayments/
  * https://www.paypal.com/il/webapps/mpp/paypal-fees?locale.x=he_IL
  * 2007-2013 PrestaShop
@@ -21,14 +21,21 @@
  *
  *  @author     BEST-KIT.COM (contact@best-kit.com)
  *  @copyright  http://best-kit.com
+ 
  *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
- define( '_FORCE_PROFIL ' , TRUE ); // ADDED
+ define( '_FORCE_PROFIL ' , false ); // ADDED YGPC
  define( '_ITEM_CATEGORY', 'Digital' );// ADDED
+ define( '_Percent_PayPal_Fees ', '0.034'); // 3.4 %
+ define( '_Recurrent_PayPal_Fees ', '1.2' ); // 1.2 shq 
+ define( ' _Bank_Fees', '1.35' ); // 1.35 shq 
+	
+ 
 if ( !$_SESSION['billing_cycles'] )
       $_SESSION['billing_cycles'] = '4';
 /* ******************************************************************************************************** */      
+     
 class paypal_recurring
 {
 	protected function generatePaymentRequest($order, $addBillingFreq = false, $descOnly = false)
@@ -38,12 +45,13 @@ class paypal_recurring
 			SELECT * FROM `' . _DB_PREFIX_ . 'cart_product`
 			WHERE `id_cart` = ' . $_cart->id . '
 		');
+		// ADDED YGPC FEES = First payment 
+		$fees=	(int)urlencode( $this->paymentAmount ) * _Percent_PayPal_Fees +   $_SESSION['billing_cycles'] * _Recurrent_PayPal_Fees + _Bank_Fees;
 
 		$request = '';
 		$i = 0;
 		foreach ($products as $product) {
-			if ($addBillingFreq || _FORCE_PROFIL ) 
-      {
+			if ($addBillingFreq) {
 				$data = unserialize($product['bestkit_psubscription']);
 				$period = new BestkitPsubscriptionPeriod($data['id_period'], Context::getContext()->language->id);
 
@@ -60,22 +68,22 @@ class paypal_recurring
 				$request .= '&PROFILESTARTDATE=' . urlencode($date);
 				$request .= '&BILLINGPERIOD=' . urlencode($period->billing_period);
 				$request .= '&BILLINGFREQUENCY=' . urlencode($period->billing_freq);
-			 // ADDED  YGPC 9/04/2016 
-      	 	 if( (int)$_SESSION['billing_cycles']  > 0 ) 
-      	    		{     
-          				$request .= '&TOTALBILLINGCYCLES=' . urlencode( $_SESSION['billing_cycles']  );
+				//	if((int)$period->billing_cycles > 0){
+				//	$request .= '&TOTALBILLINGCYCLES=' . urlencode($period->billing_cycles);     ADD YGPC 9/04/2016 
+        		  if( (int)$_SESSION['billing_cycles']  > 0 )
+        		  	{     
+        		 	 	$request .= '&TOTALBILLINGCYCLES=' . urlencode( $_SESSION['billing_cycles']  );
+        		 	 		        
+				 // Important fixing the amount of each cycle        	
+					$request .= '&AMT=' . urlencode( $this->paymentAmount) ; //  / $_SESSION['billing_cycles']   ); 	// also added by YGPC not included in 
           
-			         	} 
-			 // Important fixing the amount of each cycle        	
-			$request .= '&AMT=' . urlencode( $this->paymentAmount ) / $_SESSION['billing_cycles']  ; 	// also added by YGPC not included in original script downloaded !
-	
-				// End added 
-			} // 	if ($addBillingFreq || _FORCE_PROFIL )
+				}
+				
+			}
 
-	if ($descOnly)
-        {
+			if ($descOnly) {
 				return $order->reference;
-	  }
+			}
 
 			$desc = urlencode(Tools::substr(Product::getProductName($product['id_product'], $product['id_product_attribute']), 0, 120));
 			$request .= '&L_BILLINGAGREEMENTDESCRIPTION0=' . $order->reference;
@@ -83,14 +91,13 @@ class paypal_recurring
 			$request .= '&DESC=' . $order->reference;
 
 			$request .= '&L_PAYMENTREQUEST_' . $i . '_NAME0=' . $desc;
-			$request .= '&L_PAYMENTREQUEST_' . $i . '_AMT0=' . $this->paymentAmount; // Total amount of the all cycles 
+			$request .= '&L_PAYMENTREQUEST_' . $i . '_AMT0=' . $this->paymentAmount;
 			//$request .= '&L_PAYMENTREQUEST_' . $i . '_QTY0=' . urlencode($product['quantity']);
-	     //	$request .= '&L_PAYMENTREQUEST_0_ITEMCATEGORY0=' . _ITEM_CATEGORY; //  ADDED YGPC
-		}     // end foreach
-//	var_dump(  	$request     ); exit;
+		}
+
 		return $request;
 	}
-/* **************************************************************************************************************** */
+
 	public function setExpressCheckout()
 	{
 		$nvpStr = 
@@ -113,7 +120,7 @@ class paypal_recurring
 				$payPalURL = "https://www.".$this->environment.".paypal.com/cgi-bin/webscr&cmd=_express-checkout&token=$token";
 			}
 
-			header("Location: $payPalURL"); // redirect to paypal with parameters in $_POST 
+			header("Location: $payPalURL");
 			exit;
 		} else  {
 			$httpParsedResponseAr['order'] = $this->order;
