@@ -81,6 +81,13 @@ class bestkit_psubscription extends PaymentModule
 
         $this->displayName = $this->l('PayPal Recurring Payments');
         $this->description = $this->l('PayPal Recurring Payments & Subscriptions');
+        // ADDED YGPC logout  first time
+	  if( $_SESSION['login'] ===true )
+        	 if (isset(Context::getContext()->cookie))
+        	  {
+        		  Context::getContext()->cookie->mylogout();
+        		  $_SESSION['login']=false;
+      	  }
     }
 
 	public static function useConfig($name, $value = null)
@@ -424,8 +431,13 @@ class bestkit_psubscription extends PaymentModule
 				if ($today > $_start_date) {
 					die($this->l('Invalid subscription date!'));
 				}
-
-				$bestkit_psubscription = array('id_period' => $period, 'start_date' => $start_date);
+//				Start Date = + 1 month
+				$date1=new datetime ( date('Y-m-d', (int)strtotime($start_date)) ); 
+	    			$diff1Day = new DateInterval('P28D');
+	    			$date1->add( $diff1Day );
+	  		  	$start_date_diff =$date1->format("Y-m-d");
+	  		  
+				$bestkit_psubscription = array('id_period' => $period, 'start_date' => $start_date_diff );
 				Db::getInstance()->execute('
 					UPDATE `' . _DB_PREFIX_ . 'cart_product`
 					SET `bestkit_psubscription` = "' . pSQL(serialize($bestkit_psubscription)) . '"
@@ -491,7 +503,7 @@ class bestkit_psubscription extends PaymentModule
 		$state = $params['objOrder']->getCurrentState();
 		if ($state != Configuration::get('PS_OS_ERROR')) {
 			$this->smarty->assign(array(
-				'total_to_pay' => Tools::displayPrice($params['total_to_pay'], $params['currencyObj'], false),
+				'total_to_pay' => Tools::displayPrice($params['total_to_pay'], $params['currencyObj'], false) * $_SESSION['billing_cycles'] ,
 				'id_order' => $params['objOrder']->id
 			));
 
