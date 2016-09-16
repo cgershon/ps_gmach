@@ -77,11 +77,11 @@
 				</li>
 			{/if}
 			{if isset($show_new_products) && $show_new_products}
-			<li class="item">
+{*			<li class="item">
 				<a href="{$link->getPageLink('new-products')|escape:'html':'UTF-8'}" title="{l s='New products' mod='blockcms'}">
 					{l s='New products' mod='blockcms'}
 				</a>
-			</li>
+*}			</li>
 			{/if}
 			{if isset($show_best_sales) && $show_best_sales && !$PS_CATALOG_MODE && FALSE}<!-- YGPC ADDED  FALSE-->
 				<li class="item">
@@ -119,6 +119,11 @@
 					{l s='Sitemap' mod='blockcms'}
 				</a>
 			</li>
+            	<li>
+				<a href="{$link->getPageLink('gmachim')|escape:'html':'UTF-8'}" title="{l s='gmachim' mod='blockcms'}">
+					{l s='עוד גמ"חים' }
+				</a>
+			</li>
 			{/if}
 		</ul>
 		{$footer_text}
@@ -126,7 +131,7 @@
 	{if $display_poweredby}
 	<section class="bottom-footer col-xs-12">
 		<div>
-			{l s='[1] %3$s %2$s - Software by %1$s [/1]' mod='blockcms' sprintf=['YGPC™', 'Y'|date, '©'] tags=['<a class="_blank" href="http://www.konim.biz">'] nocache}
+			{l s='[1] %3$s %2$s - Software by %1$s [/1]' mod='blockcms' sprintf=['YGPC™', 'Y'|date, '©'] tags=['<a class="_blank" href="http://www.ygpc.net">'] nocache}
 		</div>
 	</section>
 	{/if}
