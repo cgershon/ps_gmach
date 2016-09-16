@@ -45,6 +45,13 @@
 
 {if isset($empty)}
 	<p class="alert alert-warning">{l s='Your shopping cart is empty.'}</p>
+ 
+   {literal} 
+		<script type="text/javascript"> 
+		 setTimeout( document.location= '.' ,15000); 
+        //document.location= '.'; 
+        </script> 
+  {/literal} 
 {elseif $PS_CATALOG_MODE}
 	<p class="alert alert-warning">{l s='This store has not accepted your new order.'}</p>
 {else}
