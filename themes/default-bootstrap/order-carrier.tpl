@@ -39,12 +39,78 @@ window.scroll(0,1400);
 
 <p class="info-title">
 			<br/>
-            <span> על מנת להפקיד את הסכום המבוקש לחשבון שלכם ,מלאו הטופס  
-וצרפו תעודת זהות שלכם שסרקתם לקובץ	 JPG או PGN או GIF
+            <span> על מנת להפקיד את הסכום המבוקש לחשבונכם, מלאו את הטופס  
+           
+וצרפו את תמונת תעודת הזהות<u> שלכם </u>( קובץ  JPG או PNG או GIF ) ולאשר אותה .
 			</span>
     </p>
 </div>
+<div  style=" text-align:left; padding-left:32%; background-color:#FFFFCC;" >
 
+{if !$identity_img_name }
+
+<form     action=""   method="post" enctype="multipart/form-data" >
+<font size="+2"><span class="blink_text"> * </span></font>
+<strong> בחרו תמונה של תעודת הזהות שלכם ואשרו אותה </strong> 
+
+<style type="text/css">
+.blink_text {
+
+animation:1s blinker linear infinite;
+-webkit-animation:1s blinker linear infinite;
+-moz-animation:1s blinker linear infinite;
+
+ color: red;
+}
+
+@-moz-keyframes blinker {  
+ 0% { opacity: 1.0; }
+ 50% { opacity: 0.2; }
+ 100% { opacity: 1.0; }
+ }
+
+@-webkit-keyframes blinker {  
+ 0% { opacity: 1.0; }
+ 50% { opacity: 0.2; }
+ 100% { opacity: 1.0; }
+ }
+
+@keyframes blinker {  
+ 0% { opacity: 1.0; }
+ 60% { opacity: 0.2; }
+ 100% { opacity: 1.0; }
+ }
+ 
+ 
+ </style>
+  <span style=" padding-left:70px;" >
+    <input type="file" name="identity_img" id="identity_img" value="{$identity_img_name}"  required />
+    <input type="hidden" name="step" value="2" />
+	<input type="hidden" name="back" value="{$back}"/>
+    <input type="hidden" name="identityname" value="{$identity_img_name}"  required />
+    <input type="submit" value=" אשר" name="submit" onclick=" save();" />
+	</span>
+</form>
+{else}
+
+
+  <span style=" padding-left:100px;">
+<span style=" padding-left:20px;">  {l s=' תעודת זהות '}</span>
+<p >
+      <img src="{$identity_img_real_name}"  alt="{$identity_img_name|escape:'html':'UTF-8'}" width="100" height="100"  />
+</p>
+
+ <form   action="" method="post" >
+  <span style=" padding-left:20px;">
+    <input type="submit" value=" לשנות" name="change" id="change">
+  </span> 
+ 	<input type="hidden" name="step" value="2" />
+	<input type="hidden" name="back" value="{$back}"/>
+</form>
+	</span>
+{/if}
+
+</div>
 <form id="form" action="{$link->getPageLink('order', true, NULL, "{if $multi_shipping}multi-shipping={$multi_shipping}{/if}")|escape:'html':'UTF-8'}" method="post" name=							"carrier_area">
 
 
@@ -76,7 +142,7 @@ window.scroll(0,1400);
                     
                     <th>		<label for="address1" style="padding-top:50px; padding-left:50px;">כתובת הבנק<sup>*</sup></label>
                     </th>
-                      <th>	  <label for="postcode" style="padding-top:50px; padding-left:50px;">מיקוד <sup>*</sup></label>
+                      <th>	  <label for="postcode" style="padding-top:50px; padding-left:50px;">מיקוד <sup></sup></label>
                     </th>
                     <th>       <label for="city" style="padding-top:50px; padding-left:50px;">עיר <sup>*</sup></label>
                     </th>
@@ -141,7 +207,9 @@ window.scroll(0,1400);
               
              <label for="cgv"> &nbsp;{l s='I agree to the terms of service and will adhere to them unconditionally.'}    </label>  
              
-                            <a href="{$link_conditions|escape:'html':'UTF-8'}" class="iframe" rel="nofollow">{l s='(Read the Terms of Service)'}</a>
+                          {*  <a href="{$link_conditions|escape:'html':'UTF-8'}" class="iframe" rel="nofollow">{l s='(Read the Terms of Service)'}</a> *}
+                            <a href="http://gmach.konim.biz/index.php?id_cms=3&controller=cms&id_lang=1"  rel="nofollow" dir="rtl">
+                            {l s='(Read the Terms of Service)'}</a>
                          	<input type="checkbox"  name="cgv" id="cgv" value="1" {if $checkedTOS}checked="checked"{/if}  required />
                             <input type="hidden" name="step" value="3" />
 							<input type="hidden" name="back" value="{$back}" />
@@ -162,71 +230,8 @@ window.scroll(0,1400);
   	</span>
 </form>  
 
-</div>
-<div  style=" text-align:left; padding-left:32%; background-color:#FFFFCC;" >
-
-{if !$identity_img_name }
-
-<form     action=""   method="post" enctype="multipart/form-data" >
-<font size="+2"><span class="blink_text"> * </span></font>
-<strong> בחרו תמונה של תעודת זהות ואשרו אותה </strong> 
-
-<style type="text/css">
-.blink_text {
-
-animation:1s blinker linear infinite;
--webkit-animation:1s blinker linear infinite;
--moz-animation:1s blinker linear infinite;
-
- color: red;
-}
-
-@-moz-keyframes blinker {  
- 0% { opacity: 1.0; }
- 50% { opacity: 0.2; }
- 100% { opacity: 1.0; }
- }
-
-@-webkit-keyframes blinker {  
- 0% { opacity: 1.0; }
- 50% { opacity: 0.2; }
- 100% { opacity: 1.0; }
- }
-
-@keyframes blinker {  
- 0% { opacity: 1.0; }
- 60% { opacity: 0.2; }
- 100% { opacity: 1.0; }
- }
- 
- 
- </style>
-  <span style=" padding-left:70px;" >
-    <input type="file" name="identity_img" id="identity_img" value="{$identity_img_name}"  required />
-    <input type="hidden" name="step" value="2" />
-	<input type="hidden" name="back" value="{$back}"/>
-    <input type="hidden" name="identityname" value="{$identity_img_name}"  required />
-    <input type="submit" value=" אשר" name="submit" onclick=" save();" />
-	</span>
-</form>
-{else}
 
 
-  <span style=" padding-left:100px;">
-<span style=" padding-left:20px;">  {l s=' תעודת זהות '}</span>
-<p >
-      <img src="{$identity_img_real_name}"  alt="{$identity_img_name|escape:'html':'UTF-8'}" width="100" height="100"  />
-</p>
-
- <form   action="" method="post" >
-  <span style=" padding-left:20px;">
-    <input type="submit" value=" לשנות" name="change" id="change">
-  </span> 
- 	<input type="hidden" name="step" value="2" />
-	<input type="hidden" name="back" value="{$back}"/>
-</form>
-	</span>
-{/if}
 
 </div>       
    
