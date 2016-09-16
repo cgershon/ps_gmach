@@ -29,11 +29,16 @@
 	<span class="shop-phone{if isset($is_logged) && $is_logged} is_logged{/if}">
 		<i class="icon-phone"></i>{l s='Call us now:' mod='blockcontact'} <strong>{$telnumber}</strong>
      </span>  
-	
+     <center>
+     <br/>
+     <span style="text-align:center">
+	<img src="../../img/פסוק.png" alt="פסוק" />
+    </span>
+    </span>
  <font color="#FFFFFF">    	
  <marquee  direction="right"  width="1000" scrolldelay="70">
-	&nbsp;ידוע ללווה שהעמלה של החברה פייפאל תרד מהסכום המופקד בחשבונו ולא נחשבת ריבית
-&nbsp;-	&nbsp;מבקשים מהלווים לקחת בחשבון שיש מקרים מאוד דחופים ולא לקחת הלוואה להסגת מותרות.</marquee>
+	&nbsp;ידוע ללווה שעמלת חברת " פייפאל " תרד מהסכום המופקד בחשבונו ולא נחשבת ריבית
+&nbsp; אם אין לכם כרטיס אשראי או להלוואות יותר גדולות נא להסתכל בקישור "עוד גמ'חים" -	&nbsp;מבקשים מהלווים לקחת בחשבון שיש מקרים מאוד דחופים ולא לקחת הלוואה להסגת מותרות.</marquee>
 </font>
 
 {/if}
