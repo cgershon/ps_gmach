@@ -24,12 +24,27 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+class AttachmentControllerCore extends FrontController
+{
+    public function postProcess()
+    {
+        $a = new Attachment(Tools::getValue('id_attachment'), $this->context->language->id);
+        if (!$a->id) {
+            Tools::redirect('index.php');
+        }
 
-header('Cache-Control: no-store, no-cache, must-revalidate');
-header('Cache-Control: post-check=0, pre-check=0', false);
-header('Pragma: no-cache');
+        Hook::exec('actionDownloadAttachment', array('attachment' => &$a));
 
-header('Location: ../');
-exit;
+        if (ob_get_level() && ob_get_length() > 0) {
+            ob_end_clean();
+        }
+
+        header('Content-Transfer-Encoding: binary');
+        header('Content-Type: '.$a->mime);
+        header('Content-Length: '.filesize(_PS_DOWNLOAD_DIR_.$a->file));
+        header('Content-Disposition: attachment; filename="'.utf8_decode($a->file_name).'"');
+        @set_time_limit(0);
+        readfile(_PS_DOWNLOAD_DIR_.$a->file);
+        exit;
+    }
+}

@@ -24,12 +24,33 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+class OrderSlipControllerCore extends FrontController
+{
+    public $auth = true;
+    public $php_self = 'order-slip';
+    public $authRedirection = 'order-slip';
+    public $ssl = true;
 
-header('Cache-Control: no-store, no-cache, must-revalidate');
-header('Cache-Control: post-check=0, pre-check=0', false);
-header('Pragma: no-cache');
+    public function setMedia()
+    {
+        parent::setMedia();
+        $this->addCSS(array(_THEME_CSS_DIR_.'history.css', _THEME_CSS_DIR_.'addresses.css'));
+        $this->addJqueryPlugin(array('scrollTo', 'footable', 'footable-sort'));
+        $this->addJS(array(
+            _THEME_JS_DIR_.'history.js',
+            _THEME_JS_DIR_.'tools.js') // retro compat themes 1.5
+        );
+    }
 
-header('Location: ../');
-exit;
+    /**
+     * Assign template vars related to page content
+     * @see FrontController::initContent()
+     */
+    public function initContent()
+    {
+        parent::initContent();
+
+        $this->context->smarty->assign('ordersSlip', OrderSlip::getOrdersSlip((int)$this->context->cookie->id_customer));
+        $this->setTemplate(_PS_THEME_DIR_.'order-slip.tpl');
+    }
+}

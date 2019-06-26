@@ -24,12 +24,19 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-
-header('Cache-Control: no-store, no-cache, must-revalidate');
-header('Cache-Control: post-check=0, pre-check=0', false);
-header('Pragma: no-cache');
-
-header('Location: ../');
-exit;
+class ChangeCurrencyControllerCore extends FrontController
+{
+    /**
+     * Assign template vars related to page content
+     * @see FrontController::initContent()
+     */
+    public function initContent()
+    {
+        $currency = new Currency((int)Tools::getValue('id_currency'));
+        if (Validate::isLoadedObject($currency) && !$currency->deleted) {
+            $this->context->cookie->id_currency = (int)$currency->id;
+            $this->ajaxDie('1');
+        }
+        $this->ajaxDie('0');
+    }
+}

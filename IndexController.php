@@ -24,12 +24,23 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+class IndexControllerCore extends FrontController
+{
+    public $php_self = 'index';
 
-header('Cache-Control: no-store, no-cache, must-revalidate');
-header('Cache-Control: post-check=0, pre-check=0', false);
-header('Pragma: no-cache');
+    /**
+     * Assign template vars related to page content
+     * @see FrontController::initContent()
+     */
+    public function initContent()
+    {
+        parent::initContent();
+        $this->addJS(_THEME_JS_DIR_.'index.js');
 
-header('Location: ../');
-exit;
+        $this->context->smarty->assign(array('HOOK_HOME' => Hook::exec('displayHome'),
+            'HOOK_HOME_TAB' => Hook::exec('displayHomeTab'),
+            'HOOK_HOME_TAB_CONTENT' => Hook::exec('displayHomeTabContent')
+        ));
+        $this->setTemplate(_PS_THEME_DIR_.'index.tpl');
+    }
+}
